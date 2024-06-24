@@ -11,17 +11,28 @@ from monai.utils import set_determinism
 from monai.data.image_reader import NibabelReader
 from torch.cuda.amp import autocast, GradScaler
 import pty
+import numpy as np
 pty.fork = lambda: (0, 0)
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ['PYTHONWARNINGS'] = 'ignore::RuntimeWarning'
+# os.environ['PYTHONWARNINGS'] = 'ignore::RuntimeWarning'
 
 # Set deterministic training for reproducibility
 set_determinism(seed=0)
 
+
 # Define directories
 train_path = 'dataset/MICCAI_BraTS2020_TrainingData/'
 val_path = 'dataset/MICCAI_BraTS2020_ValidationData/'
+# Set deterministic training for reproducibility
+def set_seed(seed):
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+
+set_seed(0)
+
 # Function to create a list of data dictionaries
 def create_data_list(data_dir, modality_keys):
     data_list = []
@@ -32,6 +43,7 @@ def create_data_list(data_dir, modality_keys):
             data_dict = {key: os.path.join(patient_dir, f"{patient}_{key}.nii") for key in modality_keys}
             data_list.append(data_dict)
     return data_list
+
 # Define transformations for training and validation
 def get_transforms(modality_keys, pixdim=(1.0, 1.0, 1.0)):
     transforms = Compose(
@@ -42,7 +54,7 @@ def get_transforms(modality_keys, pixdim=(1.0, 1.0, 1.0)):
             Orientationd(keys=modality_keys, axcodes="RAS"),
             ScaleIntensityRanged(keys=modality_keys, a_min=-175, a_max=250, b_min=0.0, b_max=1.0, clip=True),
             CropForegroundd(keys=modality_keys, source_key=modality_keys[0], allow_smaller=True),
-            ResizeWithPadOrCropd(keys=modality_keys, spatial_size=(256, 256, 160)),
+            ResizeWithPadOrCropd(keys=modality_keys, spatial_size=(256, 256, 160)),  # Pad to nearest multiple of 32
             RandFlipd(keys=modality_keys, prob=0.5, spatial_axis=0),
             RandFlipd(keys=modality_keys, prob=0.5, spatial_axis=1),
             RandFlipd(keys=modality_keys, prob=0.5, spatial_axis=2),
@@ -61,12 +73,11 @@ def get_val_transforms(modality_keys, pixdim=(1.0, 1.0, 1.0)):
             Orientationd(keys=modality_keys, axcodes="RAS"),
             ScaleIntensityRanged(keys=modality_keys, a_min=-175, a_max=250, b_min=0.0, b_max=1.0, clip=True),
             CropForegroundd(keys=modality_keys, source_key=modality_keys[0], allow_smaller=True),
-            ResizeWithPadOrCropd(keys=modality_keys, spatial_size=(256, 256, 160)),
+            ResizeWithPadOrCropd(keys=modality_keys, spatial_size=(256, 256, 160)),  # Pad to nearest multiple of 32
             EnsureTyped(keys=modality_keys),
         ]
     )
     return transforms
-
 # Training function
 def train_model(modality_keys, train_path, val_path, max_epochs=10, val_interval=2):
     in_channels = len(modality_keys)
@@ -155,6 +166,7 @@ def train_model(modality_keys, train_path, val_path, max_epochs=10, val_interval
 
     print(f"Training completed, best validation loss: {best_metric:.4f} at epoch {best_metric_epoch}")
     
+  
 # Run the training process with different sets of modalities
 modality_keys_list = [
     ["flair"],
@@ -164,24 +176,31 @@ modality_keys_list = [
     ["flair", "t1", "t1ce", "t2"]
 ]
 
+for modality_keys in modality_keys_list:
+    train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
+
+
+# # modality_keys = ["flair", "t1", "t1ce", "t2"]
+# modality_keys = ["flair"]
+# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
+
+# # modality_keys = ["flair", "t1", "t1ce", "t2"]
+# modality_keys = ["t1ce"]
+# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
+
+# # modality_keys = ["flair", "t1", "t1ce", "t2"]
+# modality_keys = ["flair", "t1ce"]
+# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
+
+
+# # modality_keys = ["flair", "t1", "t1ce", "t2"]
+# modality_keys = ["flair", "t1ce", "t2"]
+# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
+
+# # modality_keys = ["flair", "t1", "t1ce", "t2"]
+# modality_keys = ["flair", "t1", "t1ce", "t2"]
+# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
+
 # for modality_keys in modality_keys_list:
 #     train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
 
-# modality_keys = ["flair", "t1", "t1ce", "t2"]
-modality_keys = ["flair"]
-train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-# modality_keys = ["flair", "t1", "t1ce", "t2"]
-modality_keys = ["t1ce"]
-train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
-# modality_keys = ["flair", "t1", "t1ce", "t2"]
-modality_keys = ["flair", "t1ce"]
-train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
-# modality_keys = ["flair", "t1", "t1ce", "t2"]
-modality_keys = ["flair", "t1ce", "t2"]
-train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
-# modality_keys = ["flair", "t1", "t1ce", "t2"]
-modality_keys = ["flair", "t1", "t1ce", "t2"]
-train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
