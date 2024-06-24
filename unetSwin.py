@@ -179,28 +179,4 @@ modality_keys_list = [
 for modality_keys in modality_keys_list:
     train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
 
-
-# # modality_keys = ["flair", "t1", "t1ce", "t2"]
-# modality_keys = ["flair"]
-# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
-# # modality_keys = ["flair", "t1", "t1ce", "t2"]
-# modality_keys = ["t1ce"]
-# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
-# # modality_keys = ["flair", "t1", "t1ce", "t2"]
-# modality_keys = ["flair", "t1ce"]
-# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
-
-# # modality_keys = ["flair", "t1", "t1ce", "t2"]
-# modality_keys = ["flair", "t1ce", "t2"]
-# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
-# # modality_keys = ["flair", "t1", "t1ce", "t2"]
-# modality_keys = ["flair", "t1", "t1ce", "t2"]
-# train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
-# for modality_keys in modality_keys_list:
-#     train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
+ 
