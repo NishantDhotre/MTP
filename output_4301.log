@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/home/m1/23CS60R48/MTP/unetSwin.py", line 2, in <module>
+    import torch
+ModuleNotFoundError: No module named 'torch'
+srun: error: gnode2: task 0: Exited with exit code 1
