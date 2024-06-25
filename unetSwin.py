@@ -12,6 +12,8 @@ from monai.data.image_reader import NibabelReader
 from torch.cuda.amp import autocast, GradScaler
 import pty
 import numpy as np
+import einops
+
 pty.fork = lambda: (0, 0)
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
@@ -78,6 +80,8 @@ def get_val_transforms(modality_keys, pixdim=(1.0, 1.0, 1.0)):
         ]
     )
     return transforms
+
+
 # Training function
 def train_model(modality_keys, train_path, val_path, max_epochs=10, val_interval=2):
     in_channels = len(modality_keys)
@@ -129,8 +133,11 @@ def train_model(modality_keys, train_path, val_path, max_epochs=10, val_interval
         model.train()
         epoch_loss = 0
         step = 0
+        curr_batch = 1
         for batch_data in train_loader:
+            print(f"batch {curr_batch} started!")
             step += 1
+            curr_batch += 1
             inputs = torch.cat([batch_data[key] for key in modality_keys], dim=1).to(device)
             optimizer.zero_grad()
             with autocast():
@@ -166,6 +173,7 @@ def train_model(modality_keys, train_path, val_path, max_epochs=10, val_interval
 
     print(f"Training completed, best validation loss: {best_metric:.4f} at epoch {best_metric_epoch}")
     
+    
   
 # Run the training process with different sets of modalities
 modality_keys_list = [
@@ -177,6 +185,7 @@ modality_keys_list = [
 ]
 
 for modality_keys in modality_keys_list:
+    print("now working on ", modality_keys)
     train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
 
  
