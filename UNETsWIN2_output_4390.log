@@ -1,0 +1,23 @@
+no change     /home/m1/23CS60R48/anaconda3/condabin/conda
+no change     /home/m1/23CS60R48/anaconda3/bin/conda
+no change     /home/m1/23CS60R48/anaconda3/bin/conda-env
+no change     /home/m1/23CS60R48/anaconda3/bin/activate
+no change     /home/m1/23CS60R48/anaconda3/bin/deactivate
+no change     /home/m1/23CS60R48/anaconda3/etc/profile.d/conda.sh
+no change     /home/m1/23CS60R48/anaconda3/etc/fish/conf.d/conda.fish
+no change     /home/m1/23CS60R48/anaconda3/shell/condabin/Conda.psm1
+no change     /home/m1/23CS60R48/anaconda3/shell/condabin/conda-hook.ps1
+no change     /home/m1/23CS60R48/anaconda3/lib/python3.11/site-packages/xontrib/conda.xsh
+no change     /home/m1/23CS60R48/anaconda3/etc/profile.d/conda.csh
+no change     /home/m1/23CS60R48/.bashrc
+No action taken.
+
+CondaError: Run 'conda init' before 'conda activate'
+
+Now training on modalities: ['flair']
+Using device: cpu
+Loading dataset:   0%|          | 0/36 [00:00<?, ?it/s]Loading dataset:   3%|▎         | 1/36 [00:06<03:59,  6.84s/it]Loading dataset:   8%|▊         | 3/36 [00:10<01:43,  3.15s/it]Loading dataset:  14%|█▍        | 5/36 [00:14<01:16,  2.48s/it]Loading dataset:  19%|█▉        | 7/36 [00:17<01:04,  2.21s/it]Loading dataset:  25%|██▌       | 9/36 [00:21<00:56,  2.08s/it]Loading dataset:  31%|███       | 11/36 [00:25<00:49,  1.99s/it]Loading dataset:  36%|███▌      | 13/36 [00:29<00:44,  1.95s/it]Loading dataset:  42%|████▏     | 15/36 [00:32<00:40,  1.93s/it]Loading dataset:  47%|████▋     | 17/36 [00:37<00:40,  2.12s/it]Loading dataset:  53%|█████▎    | 19/36 [00:41<00:33,  1.96s/it]Loading dataset:  56%|█████▌    | 20/36 [00:41<00:26,  1.65s/it]Loading dataset:  58%|█████▊    | 21/36 [00:44<00:29,  1.99s/it]Loading dataset:  61%|██████    | 22/36 [00:44<00:22,  1.59s/it]Loading dataset:  64%|██████▍   | 23/36 [00:48<00:25,  1.98s/it]Loading dataset:  67%|██████▋   | 24/36 [00:48<00:18,  1.53s/it]Loading dataset:  69%|██████▉   | 25/36 [00:51<00:21,  1.99s/it]Loading dataset:  72%|███████▏  | 26/36 [00:51<00:15,  1.50s/it]Loading dataset:  75%|███████▌  | 27/36 [00:55<00:18,  2.00s/it]Loading dataset:  78%|███████▊  | 28/36 [00:55<00:11,  1.50s/it]Loading dataset:  81%|████████  | 29/36 [00:58<00:14,  2.02s/it]Loading dataset:  83%|████████▎ | 30/36 [00:58<00:09,  1.50s/it]Loading dataset:  86%|████████▌ | 31/36 [01:02<00:10,  2.00s/it]Loading dataset:  89%|████████▉ | 32/36 [01:02<00:05,  1.49s/it]Loading dataset:  92%|█████████▏| 33/36 [01:05<00:06,  2.03s/it]Loading dataset:  94%|█████████▍| 34/36 [01:05<00:03,  1.51s/it]Loading dataset:  97%|█████████▋| 35/36 [01:09<00:02,  2.04s/it]Loading dataset: 100%|██████████| 36/36 [01:10<00:00,  1.91s/it]Loading dataset: 100%|██████████| 36/36 [01:10<00:00,  1.97s/it]
+Loading dataset:   0%|          | 0/12 [00:00<?, ?it/s]Loading dataset:   8%|▊         | 1/12 [00:03<00:40,  3.70s/it]Loading dataset:  25%|██▌       | 3/12 [00:07<00:21,  2.34s/it]Loading dataset:  42%|████▏     | 5/12 [00:11<00:14,  2.11s/it]Loading dataset:  58%|█████▊    | 7/12 [00:14<00:10,  2.01s/it]Loading dataset:  75%|███████▌  | 9/12 [00:20<00:06,  2.25s/it]Loading dataset:  92%|█████████▏| 11/12 [00:23<00:02,  2.03s/it]Loading dataset: 100%|██████████| 12/12 [00:23<00:00,  1.67s/it]Loading dataset: 100%|██████████| 12/12 [00:23<00:00,  1.98s/it]
+
+Epoch 1/10
+Training:   0%|          | 0/369 [00:00<?, ?it/s]Training:   0%|          | 1/369 [05:38<34:34:38, 338.26s/it]Training:   1%|          | 2/369 [11:04<33:45:34, 331.16s/it]Training:   1%|          | 3/369 [16:26<33:13:45, 326.85s/it]Training:   1%|          | 4/369 [21:47<32:54:04, 324.51s/it]Training:   1%|▏         | 5/369 [27:12<32:50:34, 324.82s/it]Training:   2%|▏         | 6/369 [32:36<32:43:10, 324.49s/it]Training:   2%|▏         | 7/369 [38:01<32:39:46, 324.82s/it]Training:   2%|▏         | 8/369 [43:27<32:36:22, 325.16s/it]Training:   2%|▏         | 9/369 [48:51<32:28:31, 324.76s/it]Training:   3%|▎         | 10/369 [54:17<32:25:55, 325.22s/it]Training:   3%|▎         | 11/369 [59:44<32:22:37, 325.58s/it]
