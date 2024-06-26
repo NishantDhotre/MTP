@@ -9,5 +9,6 @@
 #SBATCH --output=/home/m1/23CS60R48/MTP/output_%j.log    # Standard output and error log
 
 #module load anaconda3
+conda init
 conda activate gpu
 python3 unetSwin.py

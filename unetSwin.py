@@ -22,10 +22,10 @@ os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # Set deterministic training for reproducibility
 set_determinism(seed=0)
 
-
 # Define directories
 train_path = 'dataset/MICCAI_BraTS2020_TrainingData/'
 val_path = 'dataset/MICCAI_BraTS2020_ValidationData/'
+
 # Set deterministic training for reproducibility
 def set_seed(seed):
     np.random.seed(seed)
@@ -66,6 +66,7 @@ def get_transforms(modality_keys, pixdim=(1.0, 1.0, 1.0)):
         ]
     )
     return transforms
+
 def get_val_transforms(modality_keys, pixdim=(1.0, 1.0, 1.0)):
     transforms = Compose(
         [
@@ -81,20 +82,26 @@ def get_val_transforms(modality_keys, pixdim=(1.0, 1.0, 1.0)):
     )
     return transforms
 
-
 # Training function
 def train_model(modality_keys, train_path, val_path, max_epochs=10, val_interval=2):
     in_channels = len(modality_keys)
     out_channels = len(modality_keys)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    
+
     model = SwinUNETR(
         img_size=(256, 256, 160),
         in_channels=in_channels,
         out_channels=out_channels,
         feature_size=48,
         use_checkpoint=True,
-    ).to(device)
+    )
+    
+    # Wrap model with DataParallel to utilize multiple GPUs
+    if torch.cuda.device_count() > 1:
+        print(f"Using {torch.cuda.device_count()} GPUs for training")
+        model = torch.nn.DataParallel(model)
+
+    model.to(device)
     
     loss_function = torch.nn.MSELoss()
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-5)
@@ -172,9 +179,7 @@ def train_model(modality_keys, train_path, val_path, max_epochs=10, val_interval
                     print(f"Model saved to {model_save_path} with validation loss: {best_metric:.4f}")
 
     print(f"Training completed, best validation loss: {best_metric:.4f} at epoch {best_metric_epoch}")
-    
-    
-  
+
 # Run the training process with different sets of modalities
 modality_keys_list = [
     ["flair"],
@@ -187,5 +192,3 @@ modality_keys_list = [
 for modality_keys in modality_keys_list:
     print("now working on ", modality_keys)
     train_model(modality_keys=modality_keys, train_path=train_path, val_path=val_path, max_epochs=10, val_interval=2)
-
- 
