@@ -1,0 +1,17 @@
+no change     /home/m1/23CS60R48/anaconda3/condabin/conda
+no change     /home/m1/23CS60R48/anaconda3/bin/conda
+no change     /home/m1/23CS60R48/anaconda3/bin/conda-env
+no change     /home/m1/23CS60R48/anaconda3/bin/activate
+no change     /home/m1/23CS60R48/anaconda3/bin/deactivate
+no change     /home/m1/23CS60R48/anaconda3/etc/profile.d/conda.sh
+no change     /home/m1/23CS60R48/anaconda3/etc/fish/conf.d/conda.fish
+no change     /home/m1/23CS60R48/anaconda3/shell/condabin/Conda.psm1
+no change     /home/m1/23CS60R48/anaconda3/shell/condabin/conda-hook.ps1
+no change     /home/m1/23CS60R48/anaconda3/lib/python3.11/site-packages/xontrib/conda.xsh
+no change     /home/m1/23CS60R48/anaconda3/etc/profile.d/conda.csh
+no change     /home/m1/23CS60R48/.bashrc
+No action taken.
+
+CondaError: Run 'conda init' before 'conda activate'
+
+slurmstepd: error: *** JOB 4360 ON gnode2 CANCELLED AT 2024-06-26T14:03:23 ***

@@ -5,16 +5,12 @@ from monai.transforms import (
     Compose, LoadImaged, EnsureChannelFirstd, Spacingd, Orientationd, ScaleIntensityRanged, CropForegroundd,
     RandFlipd, RandRotate90d, RandShiftIntensityd, EnsureTyped, ResizeWithPadOrCropd
 )
-from monai.data import DataLoader, CacheDataset
+from monai.data import DataLoader, PersistentDataset
 from monai.networks.nets import SwinUNETR
 from monai.utils import set_determinism
 from monai.data.image_reader import NibabelReader
 from torch.cuda.amp import autocast, GradScaler
-import pty
 import numpy as np
-import einops
-
-pty.fork = lambda: (0, 0)
 
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 # os.environ['PYTHONWARNINGS'] = 'ignore::RuntimeWarning'
@@ -114,21 +110,19 @@ def train_model(modality_keys, train_path, val_path, max_epochs=10, val_interval
     val_data_list = create_data_list(val_path, modality_keys)
 
     # Create datasets and dataloaders
-    train_ds = CacheDataset(
+    train_ds = PersistentDataset(
         data=train_data_list,
         transform=train_transforms,
-        cache_rate=0.5,
-        num_workers=8,
+        cache_dir="persistent_cache/train",
     )
-    train_loader = DataLoader(train_ds, batch_size=2, shuffle=True, num_workers=8, pin_memory=True)
+    train_loader = DataLoader(train_ds, batch_size=2, shuffle=True, num_workers=4, pin_memory=True)
 
-    val_ds = CacheDataset(
+    val_ds = PersistentDataset(
         data=val_data_list,
         transform=val_transforms,
-        cache_rate=0.5,
-        num_workers=8,
+        cache_dir="persistent_cache/val",
     )
-    val_loader = DataLoader(val_ds, batch_size=2, shuffle=False, num_workers=8, pin_memory=True)
+    val_loader = DataLoader(val_ds, batch_size=2, shuffle=False, num_workers=4, pin_memory=True)
     
     best_metric = float('inf')
     best_metric_epoch = -1
@@ -147,7 +141,7 @@ def train_model(modality_keys, train_path, val_path, max_epochs=10, val_interval
             curr_batch += 1
             inputs = torch.cat([batch_data[key] for key in modality_keys], dim=1).to(device)
             optimizer.zero_grad()
-            with autocast():
+            with autocast(enabled=torch.cuda.is_available()):
                 outputs = model(inputs)
                 loss = loss_function(outputs, inputs)
             scaler.scale(loss).backward()

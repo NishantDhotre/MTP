@@ -25,3 +25,4 @@ now working on  ['flair']
 epoch 1/10
 /home/m1/23CS60R48/anaconda3/envs/gpu/lib/python3.9/site-packages/torch/amp/autocast_mode.py:250: UserWarning: User provided device_type of 'cuda', but CUDA is not available. Disabling
   warnings.warn(
+slurmstepd: error: *** JOB 4341 ON gnode2 CANCELLED AT 2024-06-26T13:44:59 ***

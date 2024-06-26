@@ -1,0 +1,6 @@
+/home/m1/23CS60R48/anaconda3/envs/gpu/lib/python3.9/site-packages/torch/amp/grad_scaler.py:131: UserWarning: torch.cuda.amp.GradScaler is enabled, but CUDA is not available.  Disabling.
+  warnings.warn(
+now working on  ['flair']
+----------
+epoch 1/10
+ 
