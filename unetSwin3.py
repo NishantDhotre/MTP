@@ -156,7 +156,7 @@ def train_model(modality_keys, train_path, val_path, max_epochs=MAX_EPOCHS, val_
 if __name__ == "__main__":
     modality_keys_list = [
         # ["flair"],
-        ["t1ce"],
+        # ["t1ce"],
         ["flair", "t1ce"],
         ["flair", "t1ce", "t2"],
         ["flair", "t1", "t1ce", "t2"]
