@@ -123,6 +123,15 @@ def train_model(modality_keys, train_path, val_path, max_epochs=MAX_EPOCHS, val_
         epoch_loss_values.append(epoch_loss)
         print(f"Epoch {epoch + 1} average loss: {epoch_loss:.4f}")
 
+        if epoch == 1 :
+            # best_metric = val_loss
+            # best_metric_epoch = epoch + 1
+            modality_used = "_".join(modality_keys)
+            model_save_path = f"model_saved/swin_unetr_{modality_used}_best.pth"
+            os.makedirs(os.path.dirname(model_save_path), exist_ok=True)
+            torch.save(model.state_dict(), model_save_path)
+            print(f"Model saved to {model_save_path} with validation loss: {best_metric:.4f}")
+
         if (epoch + 1) % val_interval == 0:
             model.eval()
             val_loss = 0
