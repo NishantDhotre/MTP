@@ -17,7 +17,7 @@ from tqdm import tqdm
 TRAIN_PATH = 'dataset/MICCAI_BraTS2020_TrainingData/'
 VAL_PATH = 'dataset/MICCAI_BraTS2020_ValidationData/'
 MAX_EPOCHS = 10
-VAL_INTERVAL = 2
+VAL_INTERVAL = 1
 LEARNING_RATE = 1e-4
 WEIGHT_DECAY = 1e-5
 BATCH_SIZE = 1  # Kept at 1 for older GPUs
@@ -123,14 +123,7 @@ def train_model(modality_keys, train_path, val_path, max_epochs=MAX_EPOCHS, val_
         epoch_loss_values.append(epoch_loss)
         print(f"Epoch {epoch + 1} average loss: {epoch_loss:.4f}")
 
-        if epoch == 1 :
-            # best_metric = val_loss
-            # best_metric_epoch = epoch + 1
-            modality_used = "_".join(modality_keys)
-            model_save_path = f"model_saved/swin_unetr_{modality_used}_best.pth"
-            os.makedirs(os.path.dirname(model_save_path), exist_ok=True)
-            torch.save(model.state_dict(), model_save_path)
-            print(f"Model saved to {model_save_path} with validation loss: {best_metric:.4f}")
+      
 
         if (epoch + 1) % val_interval == 0:
             model.eval()
@@ -164,7 +157,7 @@ def train_model(modality_keys, train_path, val_path, max_epochs=MAX_EPOCHS, val_
 
 if __name__ == "__main__":
     modality_keys_list = [
-        ["flair"],
+        # ["flair"],
         # ["t1ce"],
         # ["flair", "t1ce"],
         ["flair", "t1ce", "t2"],
