@@ -1,0 +1,23 @@
+no change     /home/m1/23CS60R48/anaconda3/condabin/conda
+no change     /home/m1/23CS60R48/anaconda3/bin/conda
+no change     /home/m1/23CS60R48/anaconda3/bin/conda-env
+no change     /home/m1/23CS60R48/anaconda3/bin/activate
+no change     /home/m1/23CS60R48/anaconda3/bin/deactivate
+no change     /home/m1/23CS60R48/anaconda3/etc/profile.d/conda.sh
+no change     /home/m1/23CS60R48/anaconda3/etc/fish/conf.d/conda.fish
+no change     /home/m1/23CS60R48/anaconda3/shell/condabin/Conda.psm1
+no change     /home/m1/23CS60R48/anaconda3/shell/condabin/conda-hook.ps1
+no change     /home/m1/23CS60R48/anaconda3/lib/python3.11/site-packages/xontrib/conda.xsh
+no change     /home/m1/23CS60R48/anaconda3/etc/profile.d/conda.csh
+no change     /home/m1/23CS60R48/.bashrc
+No action taken.
+
+CondaError: Run 'conda init' before 'conda activate'
+
+Now training on modalities: ['flair']
+Using device: cpu
+Loading dataset:   0%|          | 0/36 [00:00<?, ?it/s]Loading dataset:   3%|▎         | 1/36 [00:06<03:39,  6.28s/it]Loading dataset:   8%|▊         | 3/36 [00:09<01:38,  2.97s/it]Loading dataset:  14%|█▍        | 5/36 [00:13<01:13,  2.38s/it]Loading dataset:  19%|█▉        | 7/36 [00:17<01:02,  2.14s/it]Loading dataset:  25%|██▌       | 9/36 [00:20<00:54,  2.02s/it]Loading dataset:  31%|███       | 11/36 [00:24<00:48,  1.94s/it]Loading dataset:  36%|███▌      | 13/36 [00:28<00:43,  1.90s/it]Loading dataset:  42%|████▏     | 15/36 [00:31<00:39,  1.88s/it]Loading dataset:  47%|████▋     | 17/36 [00:36<00:39,  2.08s/it]Loading dataset:  53%|█████▎    | 19/36 [00:39<00:32,  1.90s/it]Loading dataset:  56%|█████▌    | 20/36 [00:40<00:25,  1.61s/it]Loading dataset:  58%|█████▊    | 21/36 [00:42<00:28,  1.87s/it]Loading dataset:  61%|██████    | 22/36 [00:43<00:21,  1.53s/it]Loading dataset:  64%|██████▍   | 23/36 [00:46<00:24,  1.87s/it]Loading dataset:  67%|██████▋   | 24/36 [00:46<00:17,  1.47s/it]Loading dataset:  69%|██████▉   | 25/36 [00:49<00:20,  1.90s/it]Loading dataset:  72%|███████▏  | 26/36 [00:49<00:14,  1.44s/it]Loading dataset:  75%|███████▌  | 27/36 [00:52<00:17,  1.92s/it]Loading dataset:  78%|███████▊  | 28/36 [00:53<00:11,  1.44s/it]Loading dataset:  81%|████████  | 29/36 [00:56<00:13,  1.94s/it]Loading dataset:  83%|████████▎ | 30/36 [00:56<00:08,  1.44s/it]Loading dataset:  86%|████████▌ | 31/36 [00:59<00:09,  1.95s/it]Loading dataset:  89%|████████▉ | 32/36 [01:00<00:05,  1.44s/it]Loading dataset:  92%|█████████▏| 33/36 [01:03<00:05,  1.95s/it]Loading dataset:  94%|█████████▍| 34/36 [01:03<00:02,  1.43s/it]Loading dataset:  97%|█████████▋| 35/36 [01:06<00:01,  1.99s/it]Loading dataset: 100%|██████████| 36/36 [01:08<00:00,  1.89s/it]Loading dataset: 100%|██████████| 36/36 [01:08<00:00,  1.90s/it]
+Loading dataset:   0%|          | 0/12 [00:00<?, ?it/s]Loading dataset:   8%|▊         | 1/12 [00:03<00:41,  3.73s/it]Loading dataset:  25%|██▌       | 3/12 [00:07<00:21,  2.37s/it]Loading dataset:  42%|████▏     | 5/12 [00:11<00:15,  2.18s/it]Loading dataset:  58%|█████▊    | 7/12 [00:15<00:10,  2.06s/it]Loading dataset:  75%|███████▌  | 9/12 [00:20<00:06,  2.24s/it]Loading dataset:  92%|█████████▏| 11/12 [00:23<00:02,  2.01s/it]Loading dataset: 100%|██████████| 12/12 [00:23<00:00,  1.65s/it]Loading dataset: 100%|██████████| 12/12 [00:23<00:00,  1.98s/it]
+
+Epoch 1/10
+Training:   0%|          | 0/369 [00:00<?, ?it/s]Training:   0%|          | 1/369 [05:40<34:50:23, 340.82s/it]Training:   1%|          | 2/369 [11:04<33:42:04, 330.59s/it]Training:   1%|          | 3/369 [16:28<33:18:36, 327.64s/it]Training:   1%|          | 4/369 [21:51<33:01:48, 325.78s/it]Training:   1%|▏         | 5/369 [27:16<32:54:16, 325.43s/it]Training:   2%|▏         | 6/369 [32:40<32:47:11, 325.15s/it]Training:   2%|▏         | 7/369 [38:06<32:42:26, 325.27s/it]Training:   2%|▏         | 8/369 [43:30<32:35:08, 324.96s/it]
