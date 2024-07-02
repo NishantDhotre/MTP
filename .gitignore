@@ -1,2 +1,6 @@
 /dataset 
 Anaconda3-2024.02-1-Linux-x86_64.sh
+# all saved model pth
+/model_saved
+# ingnore all files ending with '.tar'
+*.tar          
