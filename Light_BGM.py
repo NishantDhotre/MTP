@@ -86,7 +86,7 @@ class FeatureExtractorSwinUNETR(SwinUNETR):
 def make_csv(y_pred_validation, modality_used):
     df = pd.read_csv(os.path.join(val_path, 'survival_evaluation.csv'))
     validation_ids = df['BraTS20ID'].values
-    filename = f"./global_predictons/Light_GBM/{modality_used}Light_GBM.csv"
+    filename = f"./global_predictons/Light_GBM/{modality_used}_Light_GBM.csv"
 
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
@@ -150,10 +150,10 @@ def build_model(modality_keys, train_data_list, valdate_data_list):
 
 if __name__ == "__main__":
     modality_keys_list = [
-        ["flair"],
-        ["t1ce"],
-        ["flair", "t1ce"],
-        ["flair", "t1ce", "t2"],
+        # ["flair"],
+        # ["t1ce"],
+        # ["flair", "t1ce"],
+        # ["flair", "t1ce", "t2"],
         ["flair", "t1", "t1ce", "t2"]
     ]
     train_labels, train_id = preprocess_labels(os.path.join(train_path, 'survival_info.csv'))
