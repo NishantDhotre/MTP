@@ -1,12 +1,73 @@
 import torch
-import torchvision.transforms as transforms
-from PIL import Image
-import math
-import nibabel as nib
 import numpy as np
+import random
+from scipy.ndimage import rotate, zoom
 from torch.utils.data import Dataset
+import nibabel as nib
 import os
 from tqdm import tqdm
+import math
+
+class RandomRotation3D:
+    def __init__(self, degrees):
+        self.degrees = degrees
+
+    def __call__(self, volume):
+        angle = random.uniform(-self.degrees, self.degrees)
+        axes = random.choice([(0, 1), (1, 2), (0, 2)])  # Randomly choose a plane to rotate
+        return rotate(volume, angle, axes=axes, reshape=False)
+
+class RandomResizedCrop3D:
+    def __init__(self, output_size, scale=(0.8, 1.0)):
+        self.output_size = output_size
+        self.scale = scale
+
+    def __call__(self, volume):
+        scale_factor = random.uniform(self.scale[0], self.scale[1])
+        zoomed_volume = zoom(volume, scale_factor)
+        crop_size = [min(self.output_size[i], zoomed_volume.shape[i]) for i in range(3)]
+        start = [random.randint(0, zoomed_volume.shape[i] - crop_size[i]) for i in range(3)]
+        cropped_volume = zoomed_volume[start[0]:start[0] + crop_size[0],
+                                       start[1]:start[1] + crop_size[1],
+                                       start[2]:start[2] + crop_size[2]]
+        return zoom(cropped_volume, [self.output_size[i] / cropped_volume.shape[i] for i in range(3)])
+
+class RandomHorizontalFlip3D:
+    def __call__(self, volume):
+        if random.random() > 0.5:
+            return np.flip(volume, axis=random.choice([0, 1, 2])).copy()
+        return volume
+
+class ToTensor3D:
+    def __call__(self, volume):
+        return torch.from_numpy(volume).float().unsqueeze(0)
+
+class Normalize3D:
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
+
+    def __call__(self, volume):
+        return (volume - self.mean) / self.std
+
+class Compose3D:
+    def __init__(self, transforms):
+        self.transforms = transforms
+
+    def __call__(self, volume):
+        for t in self.transforms:
+            volume = t(volume)
+        return volume
+
+# Define the 3D transformations
+normalize = Normalize3D(mean=0.5, std=0.5)
+train_transform = Compose3D([
+    RandomRotation3D(degrees=10),
+    RandomResizedCrop3D(output_size=(128, 128, 128), scale=(0.8, 1.0)),
+    RandomHorizontalFlip3D(),
+    ToTensor3D(),
+    normalize
+])
 
 class MRIDataset(Dataset):
     """Custom Dataset for loading MRI data as 3D volumes."""
@@ -29,7 +90,7 @@ class MRIDataset(Dataset):
         img_list = []
         if self.transform:
             for _ in range(self.K):
-                img_transformed = self.transform(Image.fromarray(img.astype(np.uint8)))
+                img_transformed = self.transform(img)
                 img_list.append(img_transformed)
         else:
             img_list = [torch.from_numpy(img).float().unsqueeze(0) for _ in range(self.K)]
@@ -166,13 +227,10 @@ def create_data_list(data_dir):
 
 # Paths and Hyper-parameters
 train_path = '../dataset/MICCAI_BraTS2020_TrainingData/'
-K = 5
+K = 4
 batch_size = 4  # Reduced batch size due to 3D data's high memory consumption
 tot_epochs = 10
 feature_size = 64
-
-# Transformations for MRI volumes (adapted for 3D)
-train_transform = None  # Define your transformations if needed
 
 # Initialize the backbone and the relational reasoning model
 backbone = Conv4_3D()
