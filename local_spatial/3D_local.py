@@ -243,4 +243,4 @@ train_loader = torch.utils.data.DataLoader(train_set, batch_size=batch_size, shu
 
 # Train the model
 model.train_model(tot_epochs=tot_epochs, train_loader=train_loader)
-torch.save(model.backbone.state_dict(), './backbone_mri_3d.tar')
+torch.save(model.backbone.state_dict(), './backbone_model/backbone_mri_3d.tar')

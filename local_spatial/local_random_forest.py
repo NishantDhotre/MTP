@@ -1,19 +1,22 @@
 import numpy as np
-import lightgbm as lgb
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import train_test_split, RandomizedSearchCV, cross_val_score
 from sklearn.metrics import mean_squared_error
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_selection import SelectKBest, f_regression
 import pandas as pd
 import os, re, csv
 from tqdm import tqdm
+from scipy.stats import randint
+import matplotlib.pyplot as plt
+import joblib
 
 # Define directories
 train_path = '../dataset/MICCAI_BraTS2020_TrainingData/'
 val_path = '../dataset/MICCAI_BraTS2020_ValidationData/'
 modality_key = 't1ce'
 BATCH_SIZE = 4
-model_used = 'Light_GBM'
+model_used = 'RF_Regression'
 
 def make_csv(y_pred_validation, modality_used):
     df = pd.read_csv(os.path.join(val_path, 'survival_evaluation.csv'))
@@ -26,7 +29,6 @@ def make_csv(y_pred_validation, modality_used):
         for id, day in zip(validation_ids, y_pred_validation):
             writer.writerow([id, day])
     print(f"CSV file '{filename}' created successfully.")
-
 
 def preprocess_labels(csv_file_path):
     df = pd.read_csv(csv_file_path)
@@ -41,7 +43,7 @@ def create_data_list_val(data_dir, modality_key):
     for patient in tqdm(patient_ids, desc="Creating validation data list"):
         patient_dir = os.path.join(data_dir, patient)
         if os.path.isdir(patient_dir):
-            data_path =   f"{patient}_{modality_key}.nii"
+            data_path = f"{patient}_{modality_key}.nii"
             data_list.append(data_path)
     return data_list
 
@@ -68,22 +70,35 @@ validation_features_scaled = scaler.transform(validation_features_selected)
 
 # Define the parameter distribution for RandomizedSearchCV
 param_dist = {
-    'num_leaves': [7, 15, 31],
-    'max_depth': [3, 5, 7, -1],
-    'learning_rate': [0.01, 0.05, 0.1],
-    'n_estimators': [50, 100, 200],
-    'min_child_samples': [5, 10, 20],
-    'subsample': [0.6, 0.8, 1.0],
-    'colsample_bytree': [0.6, 0.8, 1.0]
+    'n_estimators': randint(50, 300),
+    'max_depth': randint(3, 10),
+    'min_samples_split': randint(2, 20),
+    'min_samples_leaf': randint(1, 10),
+    'max_features': ['auto', 'sqrt', 'log2']
 }
 
-# Initialize the LGBMRegressor
-lgb_model = lgb.LGBMRegressor(random_state=42, verbose=-1)
+# Initialize the RandomForestRegressor
+rf_model = RandomForestRegressor(random_state=42)
 
-# Perform RandomizedSearchCV
+# Perform RandomizedSearchCV with cross-validation
 print("Performing RandomizedSearchCV...")
-random_search = RandomizedSearchCV(lgb_model, param_distributions=param_dist, n_iter=20, cv=5, random_state=42, n_jobs=-1, verbose=2, scoring='neg_mean_squared_error')
-random_search.fit(train_features_scaled, train_labels)
+random_search = RandomizedSearchCV(
+    rf_model, 
+    param_distributions=param_dist, 
+    n_iter=20, 
+    cv=5, 
+    random_state=42, 
+    n_jobs=-1, 
+    verbose=2, 
+    scoring='neg_mean_squared_error'
+)
+
+# Split the data for validation
+X_train, X_val, y_train, y_val = train_test_split(
+    train_features_scaled, train_labels, test_size=0.2, random_state=42
+)
+
+random_search.fit(X_train, y_train)
 
 # Print the best parameters and score
 print("Best parameters found: ", random_search.best_params_)
@@ -92,12 +107,38 @@ print("Best cross-validation score (RMSE): {:.2f}".format(np.sqrt(-random_search
 # Use the best model to make predictions
 best_model = random_search.best_estimator_
 
-# Predict and evaluate on a held-out set
-X_train, X_val, y_train, y_val = train_test_split(train_features_scaled, train_labels, test_size=0.2, random_state=42)
-y_pred = best_model.predict(X_val)
-mse = mean_squared_error(y_val, y_pred)
-rmse = np.sqrt(mse)
-print(f'RMSE on held-out set: {rmse}')
+# Debug information
+print(f"Features shape: {train_features_scaled.shape}")
+print(f"Labels shape: {train_labels.shape}")
+print(f"Features dtype: {train_features_scaled.dtype}")
+print(f"Labels dtype: {train_labels.dtype}")
+print(f"NaN in features: {np.isnan(train_features_scaled).any()}")
+print(f"Inf in features: {np.isinf(train_features_scaled).any()}")
+print(f"NaN in labels: {np.isnan(train_labels).any()}")
+print(f"Inf in labels: {np.isinf(train_labels).any()}")
+
+# Try fitting on a sample
+X_sample, y_sample = train_features_scaled[:1000], train_labels[:1000]
+try:
+    best_model.fit(X_sample, y_sample)
+    print("Sample fit successful")
+except Exception as e:
+    print(f"Error fitting the model on sample: {e}")
+
+# Perform cross-validation for more robust evaluation
+try:
+    cv_scores = cross_val_score(best_model, train_features_scaled, train_labels, cv=5, scoring='neg_mean_squared_error', error_score='raise')
+    rmse_scores = np.sqrt(-cv_scores)
+    print(f'Cross-validation RMSE scores: {rmse_scores}')
+    print(f'Mean RMSE: {np.mean(rmse_scores):.2f} (+/- {np.std(rmse_scores) * 2:.2f})')
+except Exception as e:
+    print(f"Error in cross-validation: {e}")
+    print("Trying with base model...")
+    base_model = RandomForestRegressor(random_state=42)
+    cv_scores = cross_val_score(base_model, train_features_scaled, train_labels, cv=5, scoring='neg_mean_squared_error', error_score='raise')
+    rmse_scores = np.sqrt(-cv_scores)
+    print(f'Cross-validation RMSE scores with base model: {rmse_scores}')
+    print(f'Mean RMSE with base model: {np.mean(rmse_scores):.2f} (+/- {np.std(rmse_scores) * 2:.2f})')
 
 # Predict on the validation set
 print("Predicting on validation set...")
@@ -106,22 +147,22 @@ validation_pred = best_model.predict(validation_features_scaled)
 make_csv(validation_pred, modality_key)
 
 # Save the trained model
-best_model.booster_.save_model(f'./GBM_model/{modality_key}_{model_used}_model.txt')
-print(f"Model saved to ./GBM_model/{modality_key}_{model_used}_model.txt")
+os.makedirs('./RF_model', exist_ok=True)
+joblib.dump(best_model, f'./RF_model/{modality_key}_{model_used}_model.joblib')
+print(f"Model saved to ./RF_model/{modality_key}_{model_used}_model.joblib")
 
 # Print feature importances
-feature_imp = pd.DataFrame(sorted(zip(best_model.feature_importances_, range(train_features_scaled.shape[1]))), columns=['Value','Feature'])
+feature_imp = pd.DataFrame(sorted(zip(best_model.feature_importances_, range(train_features_scaled.shape[1]))), columns=['Value', 'Feature'])
 print("Feature Importances:")
 print(feature_imp)
 
-# Optional: Plot feature importances
-import matplotlib.pyplot as plt
-
+# Visualize feature importances
 plt.figure(figsize=(10, 6))
 plt.bar(range(len(best_model.feature_importances_)), best_model.feature_importances_)
 plt.title('Feature Importances')
 plt.xlabel('Feature Index')
 plt.ylabel('Importance')
 plt.tight_layout()
-plt.savefig(f'./GBM_model/features_importance/{modality_key}_feature_importances.png')
-print("Feature importance plot saved as 'feature_importances.png'")
+os.makedirs('./RF_model/features_importance', exist_ok=True)
+plt.savefig(f'./RF_model/features_importance/{modality_key}_feature_importances.png')
+print(f"Feature importance plot saved as './RF_model/features_importance/{modality_key}_feature_importances.png'")

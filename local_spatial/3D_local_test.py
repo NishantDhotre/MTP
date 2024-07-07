@@ -145,7 +145,7 @@ def process_and_save_features(data_path, save_path, dataset_name, id):
 if __name__ == "__main__":
     # Initialize the backbone model
     backbone = Conv4_3D()
-    backbone.load_state_dict(torch.load('./backbone_mri_3d.tar'))
+    backbone.load_state_dict(torch.load('./backbone_model/backbone_mri_3d.tar'))
     backbone.eval()
 
     # Define the transformations
