@@ -1,0 +1,151 @@
+/home/m1/23CS60R48/MTP/local_spatial
+no change     /home/m1/23CS60R48/anaconda3/condabin/conda
+no change     /home/m1/23CS60R48/anaconda3/bin/conda
+no change     /home/m1/23CS60R48/anaconda3/bin/conda-env
+no change     /home/m1/23CS60R48/anaconda3/bin/activate
+no change     /home/m1/23CS60R48/anaconda3/bin/deactivate
+no change     /home/m1/23CS60R48/anaconda3/etc/profile.d/conda.sh
+no change     /home/m1/23CS60R48/anaconda3/etc/fish/conf.d/conda.fish
+no change     /home/m1/23CS60R48/anaconda3/shell/condabin/Conda.psm1
+no change     /home/m1/23CS60R48/anaconda3/shell/condabin/conda-hook.ps1
+no change     /home/m1/23CS60R48/anaconda3/lib/python3.11/site-packages/xontrib/conda.xsh
+no change     /home/m1/23CS60R48/anaconda3/etc/profile.d/conda.csh
+no change     /home/m1/23CS60R48/.bashrc
+No action taken.
+
+CondaError: Run 'conda init' before 'conda activate'
+
+Loading features...
+Loading labels...
+Performing feature selection...
+Scaling features...
+Performing RandomizedSearchCV...
+Fitting 5 folds for each of 20 candidates, totalling 100 fits
+Best parameters found:  {'subsample': 0.6, 'num_leaves': 31, 'n_estimators': 100, 'min_child_samples': 10, 'max_depth': 5, 'learning_rate': 0.01, 'colsample_bytree': 0.8}
+Best cross-validation score (RMSE): 353.26
+RMSE on held-out set: 345.32057998519605
+Predicting on validation set...
+CSV file '../local_predictons/Light_GBM/t2_Light_GBM.csv' created successfully.
+Model saved to ./GBM_model/t2_lightgbm_model.txt
+Feature Importances:
+    Value  Feature
+0       6       18
+1      14        5
+2      16        7
+3      26        6
+4      26       19
+5      34       14
+6      36       11
+7      45        2
+8      49        9
+9      56       10
+10     57       13
+11     63       17
+12     65        4
+13     78       16
+14     80        3
+15     88       12
+16    101        0
+17    114        1
+18    131        8
+19    151       15
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=7, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.4s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=7, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=20, n_estimators=200, num_leaves=31, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=20, n_estimators=200, num_leaves=31, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=20, n_estimators=200, num_leaves=31, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=20, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=20, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=200, num_leaves=31, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=200, num_leaves=31, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=10, n_estimators=50, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=10, n_estimators=50, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=15, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=15, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=15, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=15, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=15, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=20, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=20, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=20, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=20, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.1, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=50, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=50, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=-1, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=-1, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=-1, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=7, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.4s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=7, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=7, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=20, n_estimators=200, num_leaves=31, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=20, n_estimators=200, num_leaves=31, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=20, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=20, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=20, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.1, max_depth=3, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=5, min_child_samples=20, n_estimators=50, num_leaves=31, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=5, min_child_samples=20, n_estimators=50, num_leaves=31, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=5, min_child_samples=20, n_estimators=50, num_leaves=31, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=5, min_child_samples=20, n_estimators=50, num_leaves=31, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=5, min_child_samples=20, n_estimators=50, num_leaves=31, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=15, subsample=1.0; total time=   0.1s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=3, min_child_samples=5, n_estimators=50, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=3, min_child_samples=5, n_estimators=50, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=3, min_child_samples=5, n_estimators=50, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=3, min_child_samples=5, n_estimators=50, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.05, max_depth=3, min_child_samples=5, n_estimators=50, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=200, num_leaves=31, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=200, num_leaves=31, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=5, n_estimators=200, num_leaves=31, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=10, n_estimators=50, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=10, n_estimators=50, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.01, max_depth=7, min_child_samples=10, n_estimators=50, num_leaves=7, subsample=1.0; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=0.6, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=0.6, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=0.6, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=0.6, learning_rate=0.01, max_depth=5, min_child_samples=10, n_estimators=200, num_leaves=15, subsample=0.8; total time=   0.1s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.05, max_depth=5, min_child_samples=10, n_estimators=100, num_leaves=31, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.05, max_depth=7, min_child_samples=20, n_estimators=50, num_leaves=15, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=1.0, learning_rate=0.1, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=1.0, learning_rate=0.1, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=1.0, learning_rate=0.1, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=1.0, learning_rate=0.1, max_depth=-1, min_child_samples=5, n_estimators=200, num_leaves=7, subsample=0.6; total time=   0.1s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=50, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=50, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.8, learning_rate=0.01, max_depth=-1, min_child_samples=5, n_estimators=50, num_leaves=7, subsample=0.6; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=-1, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.8; total time=   0.0s
+[CV] END colsample_bytree=0.6, learning_rate=0.1, max_depth=-1, min_child_samples=20, n_estimators=100, num_leaves=7, subsample=0.8; total time=   0.0s
