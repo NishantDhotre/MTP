@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 # Define directories
 train_path = '../dataset/MICCAI_BraTS2020_TrainingData/'
 val_path = '../dataset/MICCAI_BraTS2020_ValidationData/'
-modality_key = 't1'
+modality_key = 't2'
 BATCH_SIZE = 4
 model_used = 'XGB_Regression'
 
@@ -167,6 +167,6 @@ plt.title('Feature Importances')
 plt.xlabel('Feature Index')
 plt.ylabel('Importance')
 plt.tight_layout()
-os.makedirs('./GBM_model/features_importance/', exist_ok=True)
-plt.savefig(f'./GBM_model/features_importance/{modality_key}_feature_importances.png')
-print(f"Feature importance plot saved as './local_spatial/GBM_model/features_importance/{modality_key}_feature_importances.png'")
+os.makedirs('./XGB_model/features_importance/', exist_ok=True)
+plt.savefig(f'./XGB_model/features_importance/{modality_key}_feature_importances.png')
+print(f"Feature importance plot saved as './local_spatial/XGB_model/features_importance/{modality_key}_feature_importances.png'")

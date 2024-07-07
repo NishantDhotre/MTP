@@ -11,7 +11,7 @@ from tqdm import tqdm
 # Define directories
 train_path = '../dataset/MICCAI_BraTS2020_TrainingData/'
 val_path = '../dataset/MICCAI_BraTS2020_ValidationData/'
-modality_key = 't1ce'
+modality_key = 't2'
 BATCH_SIZE = 4
 model_used = 'Light_GBM'
 
