@@ -7,11 +7,16 @@ from sklearn.feature_selection import SelectKBest, f_regression
 import pandas as pd
 import os, re, csv
 from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 # Define directories
 train_path = '../dataset/MICCAI_BraTS2020_TrainingData/'
 val_path = '../dataset/MICCAI_BraTS2020_ValidationData/'
-modality_key = 't2'
+modality_keys_list = [
+    ["flair", "t1ce"],
+    ["flair", "t1ce", "t2"],
+    ["flair", "t1", "t1ce", "t2"]
+]
 BATCH_SIZE = 4
 model_used = 'Light_GBM'
 
@@ -27,7 +32,6 @@ def make_csv(y_pred_validation, modality_used):
             writer.writerow([id, day])
     print(f"CSV file '{filename}' created successfully.")
 
-
 def preprocess_labels(csv_file_path):
     df = pd.read_csv(csv_file_path)
     df['Survival_days'] = df['Survival_days'].apply(lambda x: int(re.search(r'\d+', x).group()) if isinstance(x, str) else x)
@@ -41,87 +45,103 @@ def create_data_list_val(data_dir, modality_key):
     for patient in tqdm(patient_ids, desc="Creating validation data list"):
         patient_dir = os.path.join(data_dir, patient)
         if os.path.isdir(patient_dir):
-            data_path =   f"{patient}_{modality_key}.nii"
+            data_path = f"{patient}_{modality_key}.nii"
             data_list.append(data_path)
     return data_list
 
-# Load the saved features
-print("Loading features...")
-train_features = np.load(f'./features/{modality_key}/train/train_backbone_outputs.npy')
-validation_features = np.load(f'./features/{modality_key}/validation/validation_backbone_outputs.npy')
+def load_and_combine_features(modality_keys, dataset_type):
+    combined_features = []
+    for modality in modality_keys:
+        features = np.load(f'./features/{modality}/{dataset_type}/{dataset_type}_backbone_outputs.npy')
+        combined_features.append(features)
+    return np.concatenate(combined_features, axis=1)
 
-# Load the corresponding labels
-print("Loading labels...")
-train_labels, train_id = preprocess_labels(os.path.join(train_path, 'survival_info.csv'))
+# Main loop to process each combination of modalities
+for modality_keys in modality_keys_list:
+    print(f"\nProcessing modality combination: {modality_keys}")
+    
+    # Load the combined features
+    print("Loading and combining features...")
+    train_features = load_and_combine_features(modality_keys, 'train')
+    validation_features = load_and_combine_features(modality_keys, 'validation')
 
-# Feature selection
-print("Performing feature selection...")
-selector = SelectKBest(f_regression, k=20)  # Select top 20 features
-train_features_selected = selector.fit_transform(train_features, train_labels)
-validation_features_selected = selector.transform(validation_features)
+    # Load the corresponding labels
+    print("Loading labels...")
+    train_labels, train_id = preprocess_labels(os.path.join(train_path, 'survival_info.csv'))
 
-# Scale the features
-print("Scaling features...")
-scaler = StandardScaler()
-train_features_scaled = scaler.fit_transform(train_features_selected)
-validation_features_scaled = scaler.transform(validation_features_selected)
+    # Feature selection
+    print("Performing feature selection...")
+    selector = SelectKBest(f_regression, k=20 * len(modality_keys))  # Adjust k based on number of modalities
+    train_features_selected = selector.fit_transform(train_features, train_labels)
+    validation_features_selected = selector.transform(validation_features)
 
-# Define the parameter distribution for RandomizedSearchCV
-param_dist = {
-    'num_leaves': [7, 15, 31],
-    'max_depth': [3, 5, 7, -1],
-    'learning_rate': [0.01, 0.05, 0.1],
-    'n_estimators': [50, 100, 200],
-    'min_child_samples': [5, 10, 20],
-    'subsample': [0.6, 0.8, 1.0],
-    'colsample_bytree': [0.6, 0.8, 1.0]
-}
+    # Scale the features
+    print("Scaling features...")
+    scaler = StandardScaler()
+    train_features_scaled = scaler.fit_transform(train_features_selected)
+    validation_features_scaled = scaler.transform(validation_features_selected)
 
-# Initialize the LGBMRegressor
-lgb_model = lgb.LGBMRegressor(random_state=42, verbose=-1)
+    # Define the parameter distribution for RandomizedSearchCV
+    param_dist = {
+        'num_leaves': [7, 15, 31],
+        'max_depth': [3, 5, 7, -1],
+        'learning_rate': [0.01, 0.05, 0.1],
+        'n_estimators': [50, 100, 200],
+        'min_child_samples': [5, 10, 20],
+        'subsample': [0.6, 0.8, 1.0],
+        'colsample_bytree': [0.6, 0.8, 1.0]
+    }
 
-# Perform RandomizedSearchCV
-print("Performing RandomizedSearchCV...")
-random_search = RandomizedSearchCV(lgb_model, param_distributions=param_dist, n_iter=20, cv=5, random_state=42, n_jobs=-1, verbose=2, scoring='neg_mean_squared_error')
-random_search.fit(train_features_scaled, train_labels)
+    # Initialize the LGBMRegressor
+    lgb_model = lgb.LGBMRegressor(random_state=42, verbose=-1)
 
-# Print the best parameters and score
-print("Best parameters found: ", random_search.best_params_)
-print("Best cross-validation score (RMSE): {:.2f}".format(np.sqrt(-random_search.best_score_)))
+    # Perform RandomizedSearchCV
+    print("Performing RandomizedSearchCV...")
+    random_search = RandomizedSearchCV(lgb_model, param_distributions=param_dist, n_iter=20, cv=5, random_state=42, n_jobs=-1, verbose=2, scoring='neg_mean_squared_error')
+    random_search.fit(train_features_scaled, train_labels)
 
-# Use the best model to make predictions
-best_model = random_search.best_estimator_
+    # Print the best parameters and score
+    print("Best parameters found: ", random_search.best_params_)
+    print("Best cross-validation score (RMSE): {:.2f}".format(np.sqrt(-random_search.best_score_)))
 
-# Predict and evaluate on a held-out set
-X_train, X_val, y_train, y_val = train_test_split(train_features_scaled, train_labels, test_size=0.2, random_state=42)
-y_pred = best_model.predict(X_val)
-mse = mean_squared_error(y_val, y_pred)
-rmse = np.sqrt(mse)
-print(f'RMSE on held-out set: {rmse}')
+    # Use the best model to make predictions
+    best_model = random_search.best_estimator_
 
-# Predict on the validation set
-print("Predicting on validation set...")
-validation_pred = best_model.predict(validation_features_scaled)
+    # Predict and evaluate on a held-out set
+    X_train, X_val, y_train, y_val = train_test_split(train_features_scaled, train_labels, test_size=0.2, random_state=42)
+    y_pred = best_model.predict(X_val)
+    mse = mean_squared_error(y_val, y_pred)
+    rmse = np.sqrt(mse)
+    print(f'RMSE on held-out set: {rmse}')
 
-make_csv(validation_pred, modality_key)
+    # Predict on the validation set
+    print("Predicting on validation set...")
+    validation_pred = best_model.predict(validation_features_scaled)
 
-# Save the trained model
-best_model.booster_.save_model(f'./GBM_model/{modality_key}_{model_used}_model.txt')
-print(f"Model saved to ./GBM_model/{modality_key}_{model_used}_model.txt")
+    # Generate unique identifier for this combination
+    combined_modality_key = '_'.join(modality_keys)
 
-# Print feature importances
-feature_imp = pd.DataFrame(sorted(zip(best_model.feature_importances_, range(train_features_scaled.shape[1]))), columns=['Value','Feature'])
-print("Feature Importances:")
-print(feature_imp)
+    make_csv(validation_pred, combined_modality_key)
 
-# Optional: Plot feature importances
-import matplotlib.pyplot as plt
+    # Save the trained model
+    os.makedirs('./GBM_model', exist_ok=True)
+    best_model.booster_.save_model(f'./GBM_model/{combined_modality_key}_{model_used}_model.txt')
+    print(f"Model saved to ./GBM_model/{combined_modality_key}_{model_used}_model.txt")
 
-plt.figure(figsize=(10, 6))
-plt.bar(range(len(best_model.feature_importances_)), best_model.feature_importances_)
-plt.title('Feature Importances')
-plt.xlabel('Feature Index')
-plt.ylabel('Importance')
-plt.tight_layout()
-plt.savefig(f'./GBM_model/features_importance/{modality_key}_feature_importances.png')
-print("Feature importance plot saved as 'feature_importances.png'")
+    # Print feature importances
+    feature_imp = pd.DataFrame(sorted(zip(best_model.feature_importances_, range(train_features_scaled.shape[1]))), columns=['Value','Feature'])
+    print("Feature Importances:")
+    print(feature_imp)
+
+    # Plot feature importances
+    plt.figure(figsize=(10, 6))
+    plt.bar(range(len(best_model.feature_importances_)), best_model.feature_importances_)
+    plt.title(f'Feature Importances ({combined_modality_key})')
+    plt.xlabel('Feature Index')
+    plt.ylabel('Importance')
+    plt.tight_layout()
+    os.makedirs('./GBM_model/features_importance', exist_ok=True)
+    plt.savefig(f'./GBM_model/features_importance/{combined_modality_key}_feature_importances.png')
+    print(f"Feature importance plot saved as './GBM_model/features_importance/{combined_modality_key}_feature_importances.png'")
+
+    print(f"Finished processing modality combination: {modality_keys}\n")

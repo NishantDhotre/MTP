@@ -14,7 +14,11 @@ import joblib
 # Define directories
 train_path = '../dataset/MICCAI_BraTS2020_TrainingData/'
 val_path = '../dataset/MICCAI_BraTS2020_ValidationData/'
-modality_key = 't1ce'
+modality_keys_list = [
+    ["flair", "t1ce"],
+    ["flair", "t1ce", "t2"],
+    ["flair", "t1", "t1ce", "t2"]
+]
 BATCH_SIZE = 4
 model_used = 'RF_Regression'
 
@@ -47,122 +51,138 @@ def create_data_list_val(data_dir, modality_key):
             data_list.append(data_path)
     return data_list
 
-# Load the saved features
-print("Loading features...")
-train_features = np.load(f'./features/{modality_key}/train/train_backbone_outputs.npy')
-validation_features = np.load(f'./features/{modality_key}/validation/validation_backbone_outputs.npy')
+def load_and_combine_features(modality_keys, dataset_type):
+    combined_features = []
+    for modality in modality_keys:
+        features = np.load(f'./features/{modality}/{dataset_type}/{dataset_type}_backbone_outputs.npy')
+        combined_features.append(features)
+    return np.concatenate(combined_features, axis=1)
 
-# Load the corresponding labels
-print("Loading labels...")
-train_labels, train_id = preprocess_labels(os.path.join(train_path, 'survival_info.csv'))
+# Main loop to process each combination of modalities
+for modality_keys in modality_keys_list:
+    print(f"\nProcessing modality combination: {modality_keys}")
+    
+    # Load the combined features
+    print("Loading and combining features...")
+    train_features = load_and_combine_features(modality_keys, 'train')
+    validation_features = load_and_combine_features(modality_keys, 'validation')
 
-# Feature selection
-print("Performing feature selection...")
-selector = SelectKBest(f_regression, k=20)  # Select top 20 features
-train_features_selected = selector.fit_transform(train_features, train_labels)
-validation_features_selected = selector.transform(validation_features)
+    # Load the corresponding labels
+    print("Loading labels...")
+    train_labels, train_id = preprocess_labels(os.path.join(train_path, 'survival_info.csv'))
 
-# Scale the features
-print("Scaling features...")
-scaler = StandardScaler()
-train_features_scaled = scaler.fit_transform(train_features_selected)
-validation_features_scaled = scaler.transform(validation_features_selected)
+    # Feature selection
+    print("Performing feature selection...")
+    selector = SelectKBest(f_regression, k=20 * len(modality_keys))
+    train_features_selected = selector.fit_transform(train_features, train_labels)
+    validation_features_selected = selector.transform(validation_features)
 
-# Define the parameter distribution for RandomizedSearchCV
-param_dist = {
-    'n_estimators': randint(50, 300),
-    'max_depth': randint(3, 10),
-    'min_samples_split': randint(2, 20),
-    'min_samples_leaf': randint(1, 10),
-    'max_features': ['auto', 'sqrt', 'log2']
-}
+    # Scale the features
+    print("Scaling features...")
+    scaler = StandardScaler()
+    train_features_scaled = scaler.fit_transform(train_features_selected)
+    validation_features_scaled = scaler.transform(validation_features_selected)
 
-# Initialize the RandomForestRegressor
-rf_model = RandomForestRegressor(random_state=42)
+    # Define the parameter distribution for RandomizedSearchCV
+    param_dist = {
+        'n_estimators': randint(50, 300),
+        'max_depth': randint(3, 10),
+        'min_samples_split': randint(2, 20),
+        'min_samples_leaf': randint(1, 10),
+        'max_features': ['auto', 'sqrt', 'log2']
+    }
 
-# Perform RandomizedSearchCV with cross-validation
-print("Performing RandomizedSearchCV...")
-random_search = RandomizedSearchCV(
-    rf_model, 
-    param_distributions=param_dist, 
-    n_iter=20, 
-    cv=5, 
-    random_state=42, 
-    n_jobs=-1, 
-    verbose=2, 
-    scoring='neg_mean_squared_error'
-)
+    # Initialize the RandomForestRegressor
+    rf_model = RandomForestRegressor(random_state=42)
 
-# Split the data for validation
-X_train, X_val, y_train, y_val = train_test_split(
-    train_features_scaled, train_labels, test_size=0.2, random_state=42
-)
+    # Perform RandomizedSearchCV with cross-validation
+    print("Performing RandomizedSearchCV...")
+    random_search = RandomizedSearchCV(
+        rf_model, 
+        param_distributions=param_dist, 
+        n_iter=20, 
+        cv=5, 
+        random_state=42, 
+        n_jobs=-1, 
+        verbose=2, 
+        scoring='neg_mean_squared_error'
+    )
 
-random_search.fit(X_train, y_train)
+    # Split the data for validation
+    X_train, X_val, y_train, y_val = train_test_split(
+        train_features_scaled, train_labels, test_size=0.2, random_state=42
+    )
 
-# Print the best parameters and score
-print("Best parameters found: ", random_search.best_params_)
-print("Best cross-validation score (RMSE): {:.2f}".format(np.sqrt(-random_search.best_score_)))
+    random_search.fit(X_train, y_train)
 
-# Use the best model to make predictions
-best_model = random_search.best_estimator_
+    # Print the best parameters and score
+    print("Best parameters found: ", random_search.best_params_)
+    print("Best cross-validation score (RMSE): {:.2f}".format(np.sqrt(-random_search.best_score_)))
 
-# Debug information
-print(f"Features shape: {train_features_scaled.shape}")
-print(f"Labels shape: {train_labels.shape}")
-print(f"Features dtype: {train_features_scaled.dtype}")
-print(f"Labels dtype: {train_labels.dtype}")
-print(f"NaN in features: {np.isnan(train_features_scaled).any()}")
-print(f"Inf in features: {np.isinf(train_features_scaled).any()}")
-print(f"NaN in labels: {np.isnan(train_labels).any()}")
-print(f"Inf in labels: {np.isinf(train_labels).any()}")
+    # Use the best model to make predictions
+    best_model = random_search.best_estimator_
 
-# Try fitting on a sample
-X_sample, y_sample = train_features_scaled[:1000], train_labels[:1000]
-try:
-    best_model.fit(X_sample, y_sample)
-    print("Sample fit successful")
-except Exception as e:
-    print(f"Error fitting the model on sample: {e}")
+    # Debug information
+    print(f"Features shape: {train_features_scaled.shape}")
+    print(f"Labels shape: {train_labels.shape}")
+    print(f"Features dtype: {train_features_scaled.dtype}")
+    print(f"Labels dtype: {train_labels.dtype}")
+    print(f"NaN in features: {np.isnan(train_features_scaled).any()}")
+    print(f"Inf in features: {np.isinf(train_features_scaled).any()}")
+    print(f"NaN in labels: {np.isnan(train_labels).any()}")
+    print(f"Inf in labels: {np.isinf(train_labels).any()}")
 
-# Perform cross-validation for more robust evaluation
-try:
-    cv_scores = cross_val_score(best_model, train_features_scaled, train_labels, cv=5, scoring='neg_mean_squared_error', error_score='raise')
-    rmse_scores = np.sqrt(-cv_scores)
-    print(f'Cross-validation RMSE scores: {rmse_scores}')
-    print(f'Mean RMSE: {np.mean(rmse_scores):.2f} (+/- {np.std(rmse_scores) * 2:.2f})')
-except Exception as e:
-    print(f"Error in cross-validation: {e}")
-    print("Trying with base model...")
-    base_model = RandomForestRegressor(random_state=42)
-    cv_scores = cross_val_score(base_model, train_features_scaled, train_labels, cv=5, scoring='neg_mean_squared_error', error_score='raise')
-    rmse_scores = np.sqrt(-cv_scores)
-    print(f'Cross-validation RMSE scores with base model: {rmse_scores}')
-    print(f'Mean RMSE with base model: {np.mean(rmse_scores):.2f} (+/- {np.std(rmse_scores) * 2:.2f})')
+    # Try fitting on a sample
+    X_sample, y_sample = train_features_scaled[:1000], train_labels[:1000]
+    try:
+        best_model.fit(X_sample, y_sample)
+        print("Sample fit successful")
+    except Exception as e:
+        print(f"Error fitting the model on sample: {e}")
 
-# Predict on the validation set
-print("Predicting on validation set...")
-validation_pred = best_model.predict(validation_features_scaled)
+    # Perform cross-validation for more robust evaluation
+    try:
+        cv_scores = cross_val_score(best_model, train_features_scaled, train_labels, cv=5, scoring='neg_mean_squared_error', error_score='raise')
+        rmse_scores = np.sqrt(-cv_scores)
+        print(f'Cross-validation RMSE scores: {rmse_scores}')
+        print(f'Mean RMSE: {np.mean(rmse_scores):.2f} (+/- {np.std(rmse_scores) * 2:.2f})')
+    except Exception as e:
+        print(f"Error in cross-validation: {e}")
+        print("Trying with base model...")
+        base_model = RandomForestRegressor(random_state=42)
+        cv_scores = cross_val_score(base_model, train_features_scaled, train_labels, cv=5, scoring='neg_mean_squared_error', error_score='raise')
+        rmse_scores = np.sqrt(-cv_scores)
+        print(f'Cross-validation RMSE scores with base model: {rmse_scores}')
+        print(f'Mean RMSE with base model: {np.mean(rmse_scores):.2f} (+/- {np.std(rmse_scores) * 2:.2f})')
 
-make_csv(validation_pred, modality_key)
+    # Predict on the validation set
+    print("Predicting on validation set...")
+    validation_pred = best_model.predict(validation_features_scaled)
 
-# Save the trained model
-os.makedirs('./RF_model', exist_ok=True)
-joblib.dump(best_model, f'./RF_model/{modality_key}_{model_used}_model.joblib')
-print(f"Model saved to ./RF_model/{modality_key}_{model_used}_model.joblib")
+    # Generate unique identifier for this combination
+    combined_modality_key = '_'.join(modality_keys)
 
-# Print feature importances
-feature_imp = pd.DataFrame(sorted(zip(best_model.feature_importances_, range(train_features_scaled.shape[1]))), columns=['Value', 'Feature'])
-print("Feature Importances:")
-print(feature_imp)
+    make_csv(validation_pred, combined_modality_key)
 
-# Visualize feature importances
-plt.figure(figsize=(10, 6))
-plt.bar(range(len(best_model.feature_importances_)), best_model.feature_importances_)
-plt.title('Feature Importances')
-plt.xlabel('Feature Index')
-plt.ylabel('Importance')
-plt.tight_layout()
-os.makedirs('./RF_model/features_importance', exist_ok=True)
-plt.savefig(f'./RF_model/features_importance/{modality_key}_feature_importances.png')
-print(f"Feature importance plot saved as './RF_model/features_importance/{modality_key}_feature_importances.png'")
+    # Save the trained model
+    os.makedirs('./RF_model', exist_ok=True)
+    joblib.dump(best_model, f'./RF_model/{combined_modality_key}_{model_used}_model.joblib')
+    print(f"Model saved to ./RF_model/{combined_modality_key}_{model_used}_model.joblib")
+
+    # Print feature importances
+    feature_imp = pd.DataFrame(sorted(zip(best_model.feature_importances_, range(train_features_scaled.shape[1]))), columns=['Value', 'Feature'])
+    print("Feature Importances:")
+    print(feature_imp)
+
+    # Visualize feature importances
+    plt.figure(figsize=(10, 6))
+    plt.bar(range(len(best_model.feature_importances_)), best_model.feature_importances_)
+    plt.title(f'Feature Importances ({combined_modality_key})')
+    plt.xlabel('Feature Index')
+    plt.ylabel('Importance')
+    plt.tight_layout()
+    os.makedirs('./RF_model/features_importance', exist_ok=True)
+    plt.savefig(f'./RF_model/features_importance/{combined_modality_key}_feature_importances.png')
+    print(f"Feature importance plot saved as './RF_model/features_importance/{combined_modality_key}_feature_importances.png'")
+
+    print(f"Finished processing modality combination: {modality_keys}\n")
