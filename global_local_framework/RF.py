@@ -1,14 +1,16 @@
 import numpy as np
 import pandas as pd
-import lightgbm as lgb
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import RandomizedSearchCV
 import csv
 import os
 
-model_used = 'Light_GBM'
+model_used = 'RF'
+
 def ensure_directory_exists(filepath):
     os.makedirs(os.path.dirname(filepath), exist_ok=True)
+
 def load_and_combine_features(modality_keys, dataset_type):
     combined_features = []
     for modality in modality_keys:
@@ -33,7 +35,6 @@ def make_csv(y_pred_validation, modality_used):
 
     print(f"CSV file '{filename}' created successfully.")
 
-
 def load_features(modality_used):
     base_dir = os.path.join('../Global_extracted_features', modality_used)
     train_features = np.load(os.path.join(base_dir, 'train_features.npy'))
@@ -41,36 +42,36 @@ def load_features(modality_used):
     train_labels = np.load(os.path.join(base_dir, 'train_labels.npy'))
     return train_features, validate_features, train_labels
 
-
 def train_model(train_features, validate_features, train_labels, modality_used):
     scaler = StandardScaler()
     train_features_scaled = scaler.fit_transform(train_features)
     validate_features_scaled = scaler.transform(validate_features)
 
     param_dist = {
-        'num_leaves': [31, 63, 127],
-        'max_depth': [-1, 5, 10, 20],
-        'learning_rate': [0.01, 0.05, 0.1],
         'n_estimators': [100, 200, 300],
-        'min_child_samples': [10, 20, 30]
+        'max_depth': [10, 20, 30, None],
+        'min_samples_split': [2, 5, 10],
+        'min_samples_leaf': [1, 2, 4],
+        'bootstrap': [True, False]
     }
 
-    lgb_model = lgb.LGBMRegressor(random_state=42)
-    random_search = RandomizedSearchCV(lgb_model, param_distributions=param_dist, n_iter=20, cv=5, random_state=42, n_jobs=-1)
+    rf_model = RandomForestRegressor(random_state=42)
+    random_search = RandomizedSearchCV(rf_model, param_distributions=param_dist, n_iter=20, cv=5, random_state=42, n_jobs=-1)
     random_search.fit(train_features_scaled, train_labels)
 
     y_pred_validation = random_search.predict(validate_features_scaled)
     make_csv(y_pred_validation, modality_used)
 
-
-modality_keys_list_global_feaatures = [
+# Define modality keys
+modality_keys_list_global_features = [
     ["flair"],
     ["t1ce"],
     ["flair", "t1ce"],
     ["flair", "t1ce", "t2"],
     ["flair", "t1", "t1ce", "t2"]
 ]
-modality_keys_list_local_feaatures = [
+
+modality_keys_list_local_features = [
     ["flair"],
     ["t1ce"],
     ['t1'],
@@ -79,22 +80,20 @@ modality_keys_list_local_feaatures = [
     ["flair", "t1ce", "t2"],
     ["flair", "t1", "t1ce", "t2"]
 ]
-for modality_key_global in modality_keys_list_global_feaatures:
-    for modality_key_locall in modality_keys_list_local_feaatures:
+
+for modality_key_global in modality_keys_list_global_features:
+    for modality_key_local in modality_keys_list_local_features:
         # Load the combined features
-        modality_used_local = "_".join(modality_key_locall)
+        modality_used_local = "_".join(modality_key_local)
         print("Loading and combining features...")
-        local_train_features = load_and_combine_features(modality_key_locall, 'train')
-        local_validation_features = load_and_combine_features(modality_key_locall, 'validation')
+        local_train_features = load_and_combine_features(modality_key_local, 'train')
+        local_validation_features = load_and_combine_features(modality_key_local, 'validation')
 
-
-        # for modality_keys in modality_keys_list_global_feaatures:
         modality_used_global = "_".join(modality_key_global)
         global_train_features, global_validate_features, train_labels = load_features(modality_used_global)
 
         combined_training_features = np.concatenate((global_train_features, local_train_features), axis=1)
         combined_validation_features = np.concatenate((global_validate_features, local_validation_features), axis=1)
 
-        modality_used = 'global_'+ modality_used_global+'___local_' +modality_used_local
+        modality_used = 'global_' + modality_used_global + '___local_' + modality_used_local
         train_model(combined_training_features, combined_validation_features, train_labels, modality_used)
- 
