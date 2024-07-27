@@ -1,0 +1,7 @@
+make a table of research paper and obtained accuracy
+1.upload your validation dataset predictions to brats
+glcm features for 0, 45, 90, 135
+2.mrmr wrapped w feature sel
+3.deep survival (coxproportional hazard model)
+
+friday

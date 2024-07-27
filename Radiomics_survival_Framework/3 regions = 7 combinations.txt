@@ -1,0 +1,12 @@
+3 regions => 7 combinations
+4 modalities
+each features 28 times
+
+pyradiomics features, extra features mentioned there
+also see ibsi
+hog, locAL Binary 
+for now focus on extracting features from the brats 2020 dataset 
+
+dicom to image array; dont do filetoes
+
+nature paper

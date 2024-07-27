@@ -1,0 +1,4 @@
+piprlinr modules image transform(2)
+read on glcm and customise algo (1)
+same for all 
+ibsi mri standard feature extraction

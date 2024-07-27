@@ -1,0 +1,2 @@
+CasesExpected,CasesEvaluated,Accuracy,MSE,medianSE,stdSE,SpearmanR
+29.0,28.0,0.536,106807.799,21870.016,225734.808,0.504
