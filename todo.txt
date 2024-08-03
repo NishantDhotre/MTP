@@ -1,0 +1,10 @@
+kaplen meier plot
+survival func
+hazard rate
+censord and uncensored paitent
+cox func
+cox proportional hazrd  model liner and non linear
+partial log likely hood func
+deep surv model
+py torch coxph 
+[ coxtime, coxcc, pchazard] -pycox (apply this on selected features)
