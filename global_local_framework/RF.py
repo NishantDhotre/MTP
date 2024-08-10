@@ -130,7 +130,7 @@ def train_model(train_features, validate_features, train_labels, modality_used):
     random_search = RandomizedSearchCV(rf_model, param_distributions=param_dist, n_iter=20, cv=5, random_state=42, n_jobs=-1)
     random_search.fit(train_features_scaled, train_labels)
 
-    y_pred_validation = random_search.predict(validate_features_scaled)
+    y_pred_validation = random_search.predict(validate_features_selected)
     make_csv(y_pred_validation, modality_used)
     
     # Save the model, parameters, and Lasso mask
