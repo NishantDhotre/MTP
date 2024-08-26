@@ -1,1 +1,1 @@
-Parameters: {'epochs': 100, 'batch_size': 256}
+Parameters: {'penalizer': 1.0, 'n_components': 50}
